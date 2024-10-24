@@ -1,0 +1,228 @@
+import javax.swing.*; 
+import java.awt.*; import 
+java.awt.event.*;  
+import java.util.Random;  
+  
+public class SudokuGame extends JFrame {  
+  
+    // Define the size of the Sudoku board  
+    private static final int BOARD_SIZE = 9;  
+  
+    // Define the size of the sub-grid (3x3)  
+    private static final int SUB_GRID_SIZE = 3;  
+  
+    // Define the number of empty cells to create in the board     
+private static final int EMPTY_CELLS = 40;  
+  
+    // Define the font for the GUI  
+    private static final Font FONT = new Font("Arial", Font.BOLD, 24);  
+  
+    // Define the Sudoku board and the GUI cells  
+    private JTextField[][] cells;  
+    private int[][] board;  
+  
+    public SudokuGame() {  
+        // Initialize the board  
+        board = new int[BOARD_SIZE][BOARD_SIZE];         
+generateBoard();  
+  
+        // Create the GUI  
+        cells = new JTextField[BOARD_SIZE][BOARD_SIZE];  
+  
+  
+ 
+    
+        JPanel panel = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));         
+for (int i = 0; i < BOARD_SIZE; i++) {             for (int j = 0; j < BOARD_SIZE; 
+j++) {                 cells[i][j] = new JTextField(2);  
+                cells[i][j].setText(board[i][j] == 0 ? "" : String.valueOf(board[i][j]));                 
+cells[i][j].setEditable(true);  
+                cells[i][j].setFont(FONT);  
+                cells[i][j].setHorizontalAlignment(JTextField.CENTER);                 
+panel.add(cells[i][j]);  
+            }  
+        }  
+  
+        // Add buttons  
+        JButton checkButton = new JButton("Check");  
+        JButton solveButton = new JButton("Solve");  
+        JButton newGameButton = new JButton("New Game");  
+  
+        // Add action listeners to the buttons         
+checkButton.addActionListener(e -> checkBoard());         
+solveButton.addActionListener(e -> solveBoard());         
+newGameButton.addActionListener(e -> {  
+            generateBoard();  
+            updateBoard();  
+        });  
+  
+        // Create a panel for the buttons         
+JPanel buttonPanel = new JPanel();         
+buttonPanel.add(checkButton);         
+buttonPanel.add(solveButton);  
+        buttonPanel.add(newGameButton);  
+  
+        // Add the panel to the frame         
+add(panel, BorderLayout.CENTER);  
+        add(buttonPanel, BorderLayout.SOUTH);  
+  
+        // Set up the frame  
+        setSize(400, 400);  
+        setDefaultCloseOperation(EXIT_ON_CLOSE);  
+        setVisible(true);  
+  
+  
+ 
+    
+    }  
+  
+    // Method to generate a random Sudoku board     
+private void generateBoard() {  
+        // Fill the board with a valid Sudoku puzzle         
+fillBoard();  
+          
+        // Clear some cells to create a puzzle  
+        clearCells();  
+    }  
+  
+    // Method to fill the board with a valid Sudoku puzzle     
+private void fillBoard() {  
+        // This should be replaced with a proper Sudoku generation algorithm.  
+        // For simplicity, we fill the board with a valid pre-defined solution.  
+        int[][] solution = {  
+            {5, 3, 4, 6, 7, 8, 9, 1, 2},  
+            {6, 7, 2, 1, 9, 5, 3, 4, 8},  
+            {1, 9, 8, 3, 4, 2, 5, 6, 7},  
+            {8, 5, 9, 7, 6, 1, 4, 2, 3},  
+            {4, 2, 6, 8, 5, 3, 7, 9, 1},  
+            {7, 1, 3, 9, 2, 4, 8, 5, 6},  
+            {9, 6, 1, 5, 3, 7, 2, 8, 4},  
+            {2, 8, 7, 4, 1, 9, 6, 3, 5},  
+            {3, 4,  5, 2, 8, 6, 1, 7, 9}  
+        };  
+        for (int i = 0; i < BOARD_SIZE; i++) {             
+for (int j = 0; j < BOARD_SIZE; j++) {  
+                board[i][j] = solution[i][j];  
+            }  
+        }  
+    }  
+  
+    // Method to clear some cells to create a puzzle  
+    private void clearCells() {  
+        Random random = new Random();         for 
+(int i = 0; i < EMPTY_CELLS; i++) {             int 
+  
+  
+ 
+    
+row = random.nextInt(BOARD_SIZE);             int 
+col = random.nextInt(BOARD_SIZE);  
+            board[row][col] = 0;  
+        }  
+    }  
+  
+    // Method to update the GUI cells with the current board state     
+private void updateBoard() {         for (int i = 0; i < 
+BOARD_SIZE; i++) {             for (int j = 0; j < BOARD_SIZE; 
+j++) {  
+                cells[i][j].setText(board[i][j] == 0 ? "" : String.valueOf(board[i][j]));  
+            }  
+        }  
+    }  
+  
+    // Method to check the board for errors     
+private void checkBoard() {         for (int i = 0; 
+i < BOARD_SIZE; i++) {             for (int j = 0; 
+j < BOARD_SIZE; j++) {                 String 
+text = cells[i][j].getText();                 if 
+(!text.isEmpty()) {  
+                    try {  
+                        int num = Integer.parseInt(text);                         if (num < 1 || num > 
+BOARD_SIZE || !isValid(board, i, j, num)) {                             
+JOptionPane.showMessageDialog(this, "Error at (" + (i + 1) + "," + (j  
++ 1) + "): " + num + " is not a valid number for this position.");                             
+return;  
+                        }  
+                    } catch (NumberFormatException e) {  
+                        JOptionPane.showMessageDialog(this, "Error at (" + (i + 1) + "," + (j +  
+1) + "): Please enter a number between 1 and " + BOARD_SIZE + ".");                         
+return;  
+                    }  
+                }  
+            }  
+        }  
+        JOptionPane.showMessageDialog(this, "Congratulations! You have solved the 
+Sudoku puzzle.");  
+  
+  
+ 
+    
+    }  
+  
+    // Method to check if a number is valid in a given position     
+private boolean isValid(int[][] board, int row, int col, int num) {  
+        // Check the row  
+        for (int i = 0; i < BOARD_SIZE; i++) {  
+            if (board[row][i] == num) {  
+                return false;  
+            }  
+        }  
+  
+        // Check the column  
+        for (int i = 0; i < BOARD_SIZE; i++) {  
+            if (board[i][col] == num) {                 
+return false;  
+            }  
+        }  
+  
+        // Check the 3x3 box  
+        int boxRow = row - row % SUB_GRID_SIZE;         
+int boxCol = col - col % SUB_GRID_SIZE;         
+for (int i = 0; i < SUB_GRID_SIZE; i++) {             
+for (int j = 0; j < SUB_GRID_SIZE; j++) {  
+                if (board[boxRow + i][boxCol + j] == num) {                     
+return false;  
+                }  
+            }  
+        }  
+  
+        return true;  
+    }  
+  
+    // Method to solve the Sudoku puzzle     
+private void solveBoard() {  
+        // This method uses a simple backtracking algorithm to solve the Sudoku puzzle         
+if (solve(board)) {             updateBoard();  
+            JOptionPane.showMessageDialog(this, "Sudoku puzzle solved!");  
+        } else {  
+  
+  
+ 
+    
+            JOptionPane.showMessageDialog(this, "No solution exists for this Sudoku 
+puzzle.");  
+        }  
+    }  
+  
+    // Recursive method to solve the Sudoku puzzle using backtracking     
+private boolean solve(int[][] board) {         for (int i = 0; i < 
+BOARD_SIZE; i++) {             for (int j = 0; j < BOARD_SIZE; j++) 
+{  
+                if (board[i][j] == 0) {  
+                    for (int num = 1; num <= BOARD_SIZE; num++) {                         
+if (isValid(board, i, j, num)) {                             board[i][j] = num;                             
+if (solve(board)) {                                 return true;  
+                            }  
+                            board[i][j] = 0;  
+                        }                     
+}  
+                    return false;  
+                }  
+            }         }         
+return true;  
+    }  
+  
+    public static void main(String[] args) {  
+        SwingUtilities.invokeLater(() -> new SudokuGame());  
+    }  
+} 
